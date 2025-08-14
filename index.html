@@ -1,15 +1,28 @@
+<!--
+This version of "Manjeet's Weather App" restores the custom Three.js 3D Earth
+background. This approach is more performant and gives you full control over
+the animation, providing a "live" feel without the drawbacks of using an iframe.
+The code now correctly initializes and animates the 3D globe with a rotating
+cloud layer, and also includes all previous functionality.
+The app's main container and other elements have been made more transparent
+to better showcase the animated Earth background.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Weather Explorer</title>
+    <title>Manjeet's Weather App</title>
+    <!-- Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for a futuristic look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Define color variables for easy theme switching */
         :root {
             --primary-dark: #6e45e2;
             --secondary-dark: #88d3ce;
@@ -36,7 +49,8 @@
             font-family: 'Space Grotesk', sans-serif;
             color: var(--text-color);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             background-color: var(--bg-color);
         }
         
@@ -56,76 +70,47 @@
             --text-color: var(--text-light);
         }
         
+        /* Background animations and effects */
         .earth-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 200%;
+            width: 100%;
             height: 100%;
             z-index: -2;
             overflow: hidden;
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        
-        .earth-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-        }
-        
-        .clouds {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
-            z-index: -1;
-            background: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/clouds.png') repeat-x;
-            animation: moveClouds 120s linear infinite;
-            opacity: 0.6;
-            mix-blend-mode: overlay;
-        }
-        
-        @keyframes moveClouds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        
-        .weather-container {
-            perspective: 1000px;
-            flex: 1;
+
+        .weather-app-container {
+            width: 50%;
+            max-width: 800px;
+            min-width: 300px;
+            height: 90vh;
             display: flex;
-            flex-direction: column;
-            min-height: 0;
-            background-color: rgba(15, 14, 23, 0.7);
-            backdrop-filter: blur(10px);
-        }
-        
-        body.light-mode .weather-container {
-            background-color: rgba(248, 250, 252, 0.8);
+            justify-content: center;
+            align-items: center;
         }
         
         .weather-card {
-            background: rgba(15, 14, 23, 0.5);
+            /* Made more transparent for better background visibility */
+            background: rgba(15, 14, 23, 0.05); /* Transparency increased */
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transform-style: preserve-3d;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            width: 100%;
+            height: 100%;
             overflow-y: auto;
-            margin: 20px;
+            transition: all 0.5s ease;
         }
         
         body.light-mode .weather-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.15); /* Transparency increased */
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
+        /* Custom scrollbar for better aesthetics */
         .weather-card::-webkit-scrollbar {
             width: 8px;
         }
@@ -142,23 +127,23 @@
         
         .weather-content {
             padding: 2rem;
-            flex: 1;
         }
         
+        /* Input and button styles */
         .search-input {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03); /* Transparency increased */
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
             color: var(--text-color);
         }
         
         body.light-mode .search-input {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.3); /* Transparency increased */
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .search-input:focus {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05); /* Transparency increased */
             box-shadow: 0 0 0 3px rgba(110, 69, 226, 0.3);
         }
         
@@ -198,15 +183,17 @@
             text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
         }
         
+        /* Forecast card styles */
         .day-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.01); /* Transparency increased */
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         body.light-mode .day-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.2); /* Transparency increased */
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
@@ -230,8 +217,9 @@
             filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
         }
         
+        /* Theme toggle button styles */
         .theme-toggle {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             width: 50px;
@@ -256,6 +244,7 @@
             font-size: 1.2rem;
         }
         
+        /* Animations */
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
@@ -270,18 +259,15 @@
             50% { opacity: 1; }
         }
         
-        .pulsing {
-            animation: pulse 3s ease-in-out infinite;
-        }
-        
         .glow {
             text-shadow: 0 0 10px currentColor;
         }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .weather-card {
-                margin: 10px;
+            .weather-app-container {
+                width: 90%;
+                height: 95vh;
             }
             
             .weather-content {
@@ -303,27 +289,23 @@
 <body class="dark-mode">
     <!-- Earth background that moves based on location -->
     <div class="earth-container" id="earth-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/1200px-The_Earth_seen_from_Apollo_17.jpg" 
-             alt="Earth" class="earth-image" id="earth-image">
+        <div id="earth" style="width:100%;height:100%;"></div>
     </div>
-    
-    <!-- Animated clouds overlay -->
-    <div class="clouds" id="clouds"></div>
     
     <!-- Theme toggle button -->
     <div class="theme-toggle" id="theme-toggle">
-        <i class="fas fa-moon" id="theme-icon"></i>
+        <i class="fas fa-sun" id="theme-icon"></i>
     </div>
     
     <!-- Weather app container -->
-    <div class="weather-container">
-        <div class="weather-card gradient-border">
+    <div class="weather-app-container">
+        <div class="weather-card">
             <div class="weather-content">
                 <!-- Header with animated title -->
                 <div class="flex justify-between items-center mb-8">
                     <h1 class="text-3xl font-bold floating">
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 dark:from-blue-500 dark:to-green-400">COSMIC</span> 
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400 dark:from-green-400 dark:to-red-400">EXPLORER</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 dark:from-blue-500 dark:to-green-400">MANJEET'S</span> 
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400 dark:from-green-400 dark:to-red-400">WEATHER APP</span>
                     </h1>
                     <div class="flex items-center space-x-2">
                         <span class="text-sm opacity-70">LIVE</span>
@@ -335,7 +317,7 @@
                 <form id="city-form" class="mb-10 relative">
                     <div class="flex items-center bg-gradient-to-r from-purple-900/30 to-cyan-900/30 dark:from-blue-900/30 dark:to-green-900/30 rounded-full p-1 shadow-lg">
                         <input type="text" id="city-input" placeholder="Search location on Earth..." 
-                               class="search-input flex-grow p-4 pl-6 rounded-l-full bg-transparent outline-none placeholder-opacity-50">
+                                class="search-input flex-grow p-4 pl-6 rounded-l-full bg-transparent outline-none placeholder-opacity-50">
                         <button type="submit" class="search-btn p-4 px-6 rounded-full text-white font-semibold flex items-center">
                             <i class="fas fa-rocket mr-2"></i> EXPLORE
                         </button>
@@ -472,13 +454,16 @@
                 
                 <!-- Footer with cosmic theme -->
                 <div class="mt-12 pt-6 border-t border-white/10 dark:border-black/10 text-center text-sm opacity-50 pb-4">
-                    <p>Powered by quantum weather algorithms • Updated: <span id="update-time"></span></p>
-                    <p class="mt-1">© 2023 Cosmic Explorer • <span class="text-cyan-300 dark:text-green-300">Planetary Edition</span></p>
+                    <p>Built with ❤️ by Manjeet • Updated: <span id="update-time"></span></p>
+                    <p class="mt-1">© Manjeet's Weather App</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Include Three.js for 3D Earth -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     <script>
         // Use an immediately invoked function expression to keep variables out of the global scope
         (function() {
@@ -506,6 +491,30 @@
                 'Waning Gibbous': 'fas fa-moon waning-gibbous',
                 'Last Quarter': 'fas fa-moon last-quarter',
                 'Waning Crescent': 'fas fa-moon waning-crescent'
+            };
+
+            // City coordinates for Earth positioning (longitude, latitude)
+            const cityCoordinates = {
+                'london': { lon: -0.1276, lat: 51.5072 },
+                'new york': { lon: -74.0060, lat: 40.7128 },
+                'tokyo': { lon: 139.6917, lat: 35.6895 },
+                'sydney': { lon: 151.2093, lat: -33.8688 },
+                'paris': { lon: 2.3522, lat: 48.8566 },
+                'berlin': { lon: 13.4050, lat: 52.5200 },
+                'moscow': { lon: 37.6173, lat: 55.7558 },
+                'beijing': { lon: 116.4074, lat: 39.9042 },
+                'dubai': { lon: 55.2708, lat: 25.2048 },
+                'rio de janeiro': { lon: -43.1729, lat: -22.9068 },
+                'los angeles': { lon: -118.2437, lat: 34.0522 },
+                'chicago': { lon: -87.6298, lat: 41.8781 },
+                'toronto': { lon: -79.3832, lat: 43.6532 },
+                'mexico city': { lon: -99.1332, lat: 19.4326 },
+                'buenos aires': { lon: -58.3816, lat: -34.6037 },
+                'cape town': { lon: 18.4241, lat: -33.9249 },
+                'cairo': { lon: 31.2357, lat: 30.0444 },
+                'mumbai': { lon: 72.8777, lat: 19.0760 },
+                'hong kong': { lon: 114.1694, lat: 22.3193 },
+                'singapore': { lon: 103.8198, lat: 1.3521 }
             };
 
             // DOM elements
@@ -538,29 +547,127 @@
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = document.getElementById('theme-icon');
             const earthContainer = document.getElementById('earth-container');
-            const earthImage = document.getElementById('earth-image');
-            const clouds = document.getElementById('clouds');
+            const threeJsContainer = document.getElementById('earth');
             
-            // Coordinates for major cities (longitude only for horizontal movement)
-            const cityCoordinates = {
-                'london': { x: 0.1 },
-                'new york': { x: 0.7 },
-                'tokyo': { x: 0.9 },
-                'sydney': { x: 0.95 },
-                'paris': { x: 0.15 },
-                'berlin': { x: 0.2 },
-                'moscow': { x: 0.3 },
-                'beijing': { x: 0.8 },
-                'dubai': { x: 0.5 },
-                'rio de janeiro': { x: 0.4 }
-            };
+            // Three.js variables
+            let scene, camera, renderer, earthMesh, cloudsMesh, controls;
+            let targetRotation = 0;
+            let currentRotation = 0;
+            let autoRotationSpeed = 0.0005;
+
+            // Initialize 3D Earth
+            function initEarth() {
+                // Remove the old canvas if it exists
+                if (threeJsContainer.querySelector('canvas')) {
+                    threeJsContainer.querySelector('canvas').remove();
+                }
+
+                // Create scene
+                scene = new THREE.Scene();
+                
+                // Create camera
+                camera = new THREE.PerspectiveCamera(75, threeJsContainer.offsetWidth / threeJsContainer.offsetHeight, 0.1, 1000);
+                camera.position.z = 2.5;
+                
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(threeJsContainer.offsetWidth, threeJsContainer.offsetHeight);
+                threeJsContainer.appendChild(renderer.domElement);
+                
+                // Add controls
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableZoom = false;
+                controls.enablePan = false;
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                
+                // Load Earth textures
+                const textureLoader = new THREE.TextureLoader();
+                const earthTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg');
+                const bumpMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg');
+                const specularMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg');
+                const cloudTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png');
+                
+                // Create Earth material
+                const earthMaterial = new THREE.MeshPhongMaterial({
+                    map: earthTexture,
+                    bumpMap: bumpMap,
+                    bumpScale: 0.05,
+                    specularMap: specularMap,
+                    specular: new THREE.Color('grey'),
+                    shininess: 5,
+                    transparent: true,
+                    opacity: 0.7 /* Transparency of the Earth's surface itself */
+                });
+                
+                // Create Earth mesh
+                const earthGeometry = new THREE.SphereGeometry(1, 64, 64);
+                earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+                scene.add(earthMesh);
+                
+                // Create Clouds material
+                const cloudsMaterial = new THREE.MeshLambertMaterial({
+                    map: cloudTexture,
+                    transparent: true,
+                    opacity: 0.4,
+                    blending: THREE.AdditiveBlending
+                });
+
+                // Create Clouds mesh, slightly larger than the Earth
+                const cloudsGeometry = new THREE.SphereGeometry(1.005, 64, 64);
+                cloudsMesh = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
+                scene.add(cloudsMesh);
+
+                // Add ambient light
+                const ambientLight = new THREE.AmbientLight(0x333333);
+                scene.add(ambientLight);
+                
+                // Add directional light (sun)
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(5, 3, 5);
+                scene.add(directionalLight);
+                
+                // Handle window resize
+                window.addEventListener('resize', onWindowResize);
+                
+                // Start animation loop
+                animate();
+            }
+            
+            function onWindowResize() {
+                camera.aspect = threeJsContainer.offsetWidth / threeJsContainer.offsetHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(threeJsContainer.offsetWidth, threeJsContainer.offsetHeight);
+            }
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Smooth rotation to target, or continuous slow rotation if idle
+                if (Math.abs(targetRotation - currentRotation) > 0.001) {
+                    currentRotation += (targetRotation - currentRotation) * 0.05;
+                } else {
+                    currentRotation += autoRotationSpeed;
+                }
+
+                if (earthMesh) {
+                    earthMesh.rotation.y = currentRotation;
+                }
+                
+                // Rotate clouds slightly faster for a dynamic effect
+                if (cloudsMesh) {
+                    cloudsMesh.rotation.y += 0.0007;
+                }
+                
+                controls.update();
+                renderer.render(scene, camera);
+            }
             
             // Initialize theme
             function initTheme() {
                 const savedTheme = localStorage.getItem('theme') || 'dark';
                 document.body.className = `${savedTheme}-mode`;
                 themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-                updateCloudsOpacity(savedTheme);
             }
             
             // Toggle theme
@@ -573,35 +680,23 @@
                 localStorage.setItem('theme', newTheme);
                 
                 themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-                updateCloudsOpacity(newTheme);
             }
             
-            // Update clouds opacity based on theme
-            function updateCloudsOpacity(theme) {
-                clouds.style.opacity = theme === 'dark' ? '0.6' : '0.3';
-            }
-            
-            // Move earth background based on city
-            function moveEarthBackground(city) {
+            // Rotate Earth to show selected city
+            function rotateEarthToCity(city) {
                 const normalizedCity = city.toLowerCase();
-                let xPos = 0.5; // Default position
+                let longitude = 0; // Default to Greenwich
                 
                 // Find the closest matching city
                 for (const [cityName, coords] of Object.entries(cityCoordinates)) {
                     if (normalizedCity.includes(cityName)) {
-                        xPos = coords.x;
+                        longitude = coords.lon;
                         break;
                     }
                 }
                 
-                // Calculate transform (earth image is 200% wide)
-                const transformValue = `translateX(-${xPos * 50}%)`;
-                earthContainer.style.transform = transformValue;
-                
-                // Adjust cloud speed based on wind speed if available
-                const windSpeed = windEl.textContent ? parseInt(windEl.textContent) : 20;
-                const cloudSpeed = Math.min(120, Math.max(60, 120 - windSpeed));
-                clouds.style.animationDuration = `${cloudSpeed}s`;
+                // Convert longitude to rotation (negative because Three.js rotates clockwise)
+                targetRotation = -longitude * (Math.PI / 180);
             }
             
             // Get temperature gradient class
@@ -682,8 +777,8 @@
                     uvEl.textContent = data.current.uv;
                     
                     // Update astronomical data
-                    sunriseEl.textContent = formatTime(data.forecast.forecastday[0].astro.sunrise);
-                    sunsetEl.textContent = formatTime(data.forecast.forecastday[0].astro.sunset);
+                    sunriseEl.textContent = data.forecast.forecastday[0].astro.sunrise;
+                    sunsetEl.textContent = data.forecast.forecastday[0].astro.sunset;
                     moonPhaseEl.innerHTML = `<i class="${moonPhases[data.forecast.forecastday[0].astro.moon_phase] || 'fas fa-moon'} mr-1"></i> ${data.forecast.forecastday[0].astro.moon_phase}`;
                     
                     // Update air quality data
@@ -695,6 +790,19 @@
                         coEl.textContent = 'N/A';
                         ozoneEl.textContent = 'N/A';
                         airQualityEl.textContent = 'N/A';
+                    }
+                    
+                    // Rotate Earth to show the selected location
+                    rotateEarthToCity(city);
+                    
+                    // Set day/night mode based on current time
+                    const isDay = data.current.is_day === 1;
+                    const isBodyDark = document.body.classList.contains('dark-mode');
+                    // Check if current theme needs to be toggled
+                    if (isDay && isBodyDark) {
+                        toggleTheme();
+                    } else if (!isDay && !isBodyDark) {
+                        toggleTheme();
                     }
                     
                     // Update the 7-day forecast section
@@ -720,21 +828,11 @@
                         forecastContainerEl.innerHTML += forecastCard;
                     });
                     
-                    // Move earth background to show the selected location
-                    moveEarthBackground(city);
-                    
-                    // Set day/night mode based on current time
-                    const isDay = data.current.is_day === 1;
-                    if ((isDay && document.body.classList.contains('dark-mode')) || 
-                        (!isDay && document.body.classList.contains('light-mode'))) {
-                        toggleTheme();
-                    }
-                    
                     // Hide the loading spinner and show the weather data
                     loadingEl.classList.add('hidden');
                     weatherDataEl.classList.remove('hidden');
                     
-                    // Add hover effect to forecast cards
+                    // Add hover effect to forecast cards (This was a good idea, but it needs to be added after the cards are created)
                     const dayCards = document.querySelectorAll('.day-card');
                     dayCards.forEach(card => {
                         card.addEventListener('mouseenter', () => {
@@ -760,6 +858,7 @@
             
             // Initialize the app
             function init() {
+                initEarth();
                 initTheme();
                 fetchWeather(defaultCity);
                 
@@ -779,10 +878,13 @@
                 });
                 
                 themeToggle.addEventListener('click', toggleTheme);
+
+                // Re-calculate canvas size on window resize
+                window.addEventListener('resize', onWindowResize);
             }
             
             // Start the app
-            init();
+            window.onload = init;
         })();
     </script>
 </body>
